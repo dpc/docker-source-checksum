@@ -56,7 +56,11 @@ fn get_external_paths_from_dockerfile_line(line: String) -> Result<Vec<PathBuf>>
             }
             let src_globs = &src_globs[..src_globs.len() - 1];
             for src_glob in src_globs {
-                for entry in glob::glob(src_glob)? {
+                let matches: Vec<_> = glob::glob(src_glob)?.collect();
+                if matches.is_empty() {
+                    info!("{} glob did not match any files", src_glob);
+                }
+                for entry in matches {
                     let entry = entry?;
                     debug!("Matching path found: {}", entry.display());
                     res.push(entry);
