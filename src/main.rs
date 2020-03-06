@@ -58,15 +58,18 @@ fn get_external_paths_from_dockerfile_line(line: String) -> Result<Vec<PathBuf>>
             trace!("Src globs: {:?}", src_globs);
 
             if let Some(first_src) = src_globs.get(0) {
-                // Skip `COPY --from=...` entirely, since it doesn't refer
-                // to external files
-                if first_src.starts_with("--from=") {
-                    return Ok(res);
-                }
                 // Skip `--chown=...`, just to not have to log it doesn't
                 // match anything
                 if first_src.starts_with("--chown=") {
                     src_globs = &src_globs[1..]
+                }
+            }
+
+            if let Some(first_src) = src_globs.get(0) {
+                // Skip `COPY --from=...` entirely, since it doesn't refer
+                // to external files
+                if first_src.starts_with("--from=") {
+                    return Ok(res);
                 }
             }
 
