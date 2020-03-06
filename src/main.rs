@@ -55,6 +55,15 @@ fn get_external_paths_from_dockerfile_line(line: String) -> Result<Vec<PathBuf>>
                 bail!("No arguments to {} command?", cmd);
             }
             let src_globs = &src_globs[..src_globs.len() - 1];
+
+            // Skip `COPY --from=...` entirely, since it doesn't refer
+            // to external files
+            if let Some(first_src) = src_globs.get(0) {
+                if first_src.starts_with("--from=") {
+                    return Ok(res);
+                }
+            }
+
             for src_glob in src_globs {
                 let matches: Vec<_> = glob::glob(src_glob)?.collect();
                 if matches.is_empty() {
