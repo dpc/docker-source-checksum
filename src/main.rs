@@ -9,7 +9,7 @@ use failure::{format_err, ResultExt};
 use glob;
 use log::{debug, info, trace};
 use std::collections::HashSet;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 fn get_coalesced_lines_from_dockerfile_content(content: String) -> Result<Vec<String>> {
@@ -91,14 +91,10 @@ fn get_external_paths_from_dockerfile_line(line: String) -> Result<Vec<PathBuf>>
     Ok(res)
 }
 
-fn get_paths_from_dockerfile(path: &Path) -> Result<Vec<PathBuf>> {
-    debug!("Opening dockerfile: {}", path.display());
-    let content = std::fs::read_to_string(path)
-        .with_context(|_| format_err!("Could not read dockerfile: {}", path.display()))?;
-
+fn get_paths_from_dockerfile(content: &str) -> Result<Vec<PathBuf>> {
     let mut res = vec![];
 
-    for line in get_coalesced_lines_from_dockerfile_content(content)? {
+    for line in get_coalesced_lines_from_dockerfile_content(content.into())? {
         res.append(&mut get_external_paths_from_dockerfile_line(line)?);
     }
 
@@ -109,6 +105,16 @@ fn run() -> Result<()> {
     env_logger::init();
     let opts = opts::Opts::from_args();
 
+    let dockerfile_path = opts
+        .dockerfile_path
+        .clone()
+        .unwrap_or_else(|| opts.context_path.join("Dockerfile"));
+
+    debug!("Opening dockerfile: {}", dockerfile_path.display());
+    let dockerfile_content = std::fs::read_to_string(&dockerfile_path).with_context(|_| {
+        format_err!("Could not read dockerfile: {}", dockerfile_path.display())
+    })?;
+
     std::env::set_current_dir(&opts.context_path).with_context(|_e| {
         format_err!(
             "Couldn't cd to context dir: {}",
@@ -118,12 +124,7 @@ fn run() -> Result<()> {
 
     let rel_ignore_paths: HashSet<_> = opts.ignore_path.clone().into_iter().collect();
 
-    let dockerfile_path = opts
-        .dockerfile_path
-        .clone()
-        .unwrap_or_else(|| PathBuf::from("Dockerfile"));
-
-    let paths_from_dockerfile = get_paths_from_dockerfile(&dockerfile_path)?;
+    let paths_from_dockerfile = get_paths_from_dockerfile(&dockerfile_content)?;
 
     for path in &paths_from_dockerfile {
         info!("Dockerfile depends on: {}", path.display());
@@ -132,7 +133,6 @@ fn run() -> Result<()> {
     let mut digests = paths_from_dockerfile
         .into_iter()
         .chain(opts.extra_path)
-        .chain(vec![dockerfile_path])
         .map(|path| {
             let digest = crev_recursive_digest::get_recursive_digest_for_dir::<blake2::Blake2b, _>(
                 &path,
@@ -159,6 +159,8 @@ fn run() -> Result<()> {
             .map(|s| s.as_bytes().to_vec())
             .collect(),
     );
+
+    digests.push(dockerfile_content.as_bytes().to_vec());
 
     digests.sort();
 
