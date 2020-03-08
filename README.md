@@ -10,7 +10,7 @@ even when the rest of the monorepo did.
 `docker-source-checksum` will calculate a hash of:
 
 * `Dockerfile` content
-* all source files referenced by that `Dockerfile` (by parsing it)
+* all source files referenced by that `Dockerfile` (figured out by parsing it)
 * any additiona arguments that might affect the build
 
 and then hashing all of these together, to give you deterministic checksum,
