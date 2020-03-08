@@ -23,7 +23,7 @@ were already built (eg. by taging them with that checksum).
 * don't use it on untrusted `Dockerfiles`
 * the exact checksum is not stable yet and can change between versions
 * `["src1", "src", "dst"]` syntax of `ADD` and `COPY` is not supported (PRs welcome)
-* file modes and ownership is ignored
-* it was put together in 2 hours, so if you plan to use it in production, maybe... review the code or something and tell me it's OK
+* file ownership is ignored
+* it was put together in 2 hours, so if you plan to use it in production, maybe... review the code or something and tell me what you think
 
 Having said that, seems to work great.

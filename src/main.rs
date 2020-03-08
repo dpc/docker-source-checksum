@@ -101,6 +101,25 @@ fn get_paths_from_dockerfile(content: &str) -> Result<Vec<PathBuf>> {
     Ok(res)
 }
 
+#[cfg(unix)]
+fn metadata_to_u16(metadata: &std::fs::Metadata) -> u16 {
+    let permissions = metadata.permissions();
+    use std::os::unix::fs::PermissionsExt;
+    ((permissions.mode() & 0x1ff) as u16)
+}
+
+#[cfg(not(unix))]
+fn metadata_to_u16(metadata: &std::fs::Metadata) -> u16 {
+    let permissions = metadata.permissions();
+    // TODO: what else to do on Windows?
+    match (permissions.readonly(), metadata.is_dir()) {
+        (false, false) => 0o444u16,
+        (false, true) => 0o555,
+        (true, false) => 0x666,
+        (true, true) => 0x777,
+    }
+}
+
 fn run() -> Result<()> {
     env_logger::init();
     let opts = opts::Opts::from_args();
@@ -134,10 +153,18 @@ fn run() -> Result<()> {
         .into_iter()
         .chain(opts.extra_path)
         .map(|path| {
-            let digest = crev_recursive_digest::get_recursive_digest_for_dir::<blake2::Blake2b, _>(
-                &path,
-                &rel_ignore_paths,
-            );
+            let rdigest = crev_recursive_digest::RecursiveDigest::<blake2::Blake2b, _, _>::new()
+                .additional_data(|entry, writer| {
+                    let metadata = entry.metadata()?;
+                    writer.input(&metadata_to_u16(&metadata).to_be_bytes());
+                    Ok(())
+                })
+                .filter(|entry| {
+                    let rel_path = entry.path().strip_prefix(&path).expect("must be prefix");
+                    !rel_ignore_paths.contains(rel_path)
+                })
+                .build();
+            let digest = rdigest.get_digest_of(&path);
 
             if let Ok(ref digest) = digest {
                 debug!(
