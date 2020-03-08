@@ -110,9 +110,9 @@ dependencies = [
 
 [[package]]
 name = "crev-recursive-digest"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1233fe7d47fb9e28a9ec9a31ff37b7d236addd80c8c0a94950daa7d3d4f0d875"
+checksum = "8a2311e13cb92890481e096346c189285b63ca513d1a9735c947e878f15729a9"
 dependencies = [
  "digest",
  "thiserror",
@@ -140,7 +140,7 @@ dependencies = [
 
 [[package]]
 name = "docker-source-checksum"
-version = "0.1.3"
+version = "0.2.0"
 dependencies = [
  "base64",
  "blake2",
