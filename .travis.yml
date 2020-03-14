@@ -1,11 +1,77 @@
 language: rust
-cache:
-  - cargo
-rust:
-  - stable
-  - beta
-  - nightly
-os:
-  - linux
-  - osx
-  - windows
+cache: cargo
+
+env:
+  global:
+    - PROJECT_NAME=docker-source-checksum
+
+matrix:
+  include:
+    # deployments
+    - env: DEPLOY=1 TARGET=x86_64-unknown-linux-musl OPENSSL_DIR=$HOME/openssl-musl
+      before_script: ./ci/travis-musl-openssl.sh
+      script:
+        - cargo build --locked --release --target $TARGET
+      os: linux
+      addons:
+        apt:
+          packages:
+          - musl-tools
+    - env: DEPLOY=1 TARGET=x86_64-apple-darwin OPENSSL_STATIC=yes
+      script:
+        - cargo build --locked --release --target $TARGET
+      os: osx
+    - env: DEPLOY=1 OPENSSL_STATIC=yes TARGET=x86_64-pc-windows-gnu
+      script:
+        - rustup target list
+        - cargo build --locked --release --target $TARGET
+      os: windows
+    - env: DEPLOY=1 OPENSSL_STATIC=yes TARGET=x86_64-pc-windows-msvc
+      script:
+        - rustup target add $TARGET
+        - cargo build --locked --release --target $TARGET
+      os: windows
+
+    # rustc version compat
+    - rust: 1.41.0 # oldest supported version, keep in sync with README.md
+    - rust: beta
+    - rust: nightly
+
+  allow_failures:
+    - rust: nightly
+
+script:
+  - cargo build --release --locked --verbose
+  - RUST_BACKTRACE=1 cargo test --release --locked --all --verbose
+
+before_deploy:
+  - "./ci/prep_deploy.sh"
+
+deploy:
+  - provider: releases
+    overwrite: true
+    draft: true
+    api_key:
+      secure: "zeZuoedwGfp296sdBrEMAvwwPHAp+zegbP9MLGW6KJAOU7K/1rwUmHsl4qesBidVj/eIC7QC92h76bHM2sth1UYessDubZKkJe+gzHoQebkY9zHPKhvL0+M7aOJMXy7LCfmO5XFJLTabUGo9Dk5zhIH4rhWS+oEIKlryxwhxGkrWTiv9qz9LGKxsdjrcnqqjpGdad5So1h9K/F1XXoyI1HHdluWxevn29s1b2a2LMwBdMNuTLd7jQRT9j18fN7DbbJ90OHclZO0P3BlG4nF9fCiZt9TH1DL7ZJRjYKiZiJkS4DN0H6wFg3SPw+z9TLoQ/pS1xvdibSDAns21pZgozeC3AQKpNAOcjXuWKaVknvNcbQ6LG4/OcbqzBbmnyt8sSN3WwNn4rxoXAYG4hq/K+IC9r2OVXceyIHhjA0eYKSlgci0i2/pOqp9SdW5T6pmiJHP4fRp/S+VP8GgiVco72Uqic7HxqMjhoFo1Hwfq53TmSn1ZF/wZjn6b+0/BsIXCViyYXQs3kpqnPRKDQg7xp3RaqOosdtyjWnuCNk7vdP6wqlfLXksgs7ok6W5NEXuChj3AiDoE9RQIO34vHLlNKOA9u6yeTdZXPYI+bGV9eCvvBP20dw84IDxBfRiuH9y3J4qqtHmdDPwHDBFd6jX9HKlEU65+vJGsMRwApt3SRwE="
+    file_glob: true
+    file: $PROJECT_NAME-$TRAVIS_TAG-$TARGET.*
+    on:
+      condition: $DEPLOY = 1
+      tags: true
+    skip_cleanup: true
+
+cache: cargo
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
+
+branches:
+  only:
+    # release tags
+    - /^v\d+\.\d+\.\d+.*$/
+    - master
+    - devel
+
+notifications:
+  email:
+    on_success: never
