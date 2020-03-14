@@ -1,6 +1,6 @@
 [package]
 name = "docker-source-checksum"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Dawid Ciężarkiewicz <dpc@dpc.pw>"]
 edition = "2018"
 description = "Deterministic source-based docker image checksum"
@@ -10,7 +10,6 @@ homepage = "https://github.com/docker-source-checksum-dev/cargo-docker-source-ch
 keywords = ["docker", "dockerfile", "tool", "checksum"]
 license = "MPL-2.0 OR MIT OR Apache-2.0"
 readme = "README.md"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 failure = "0.1"
