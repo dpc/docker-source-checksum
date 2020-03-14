@@ -57,5 +57,5 @@ OPTIONS:
         --ignore-path <ignore-path>...      Path relative to context to ignore in the checksum
 
 ARGS:
-    <context-path>    Dockerfile build context pa
+    <context-path>    Dockerfile build context path
 ```
