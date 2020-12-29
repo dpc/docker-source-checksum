@@ -105,7 +105,7 @@ fn get_paths_from_dockerfile(content: &str) -> Result<Vec<PathBuf>> {
 fn metadata_to_u16(metadata: &std::fs::Metadata) -> u16 {
     let permissions = metadata.permissions();
     use std::os::unix::fs::PermissionsExt;
-    ((permissions.mode() & 0x1ff) as u16)
+    (permissions.mode() & 0x1ff) as u16
 }
 
 #[cfg(not(unix))]
