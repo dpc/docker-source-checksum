@@ -71,6 +71,7 @@ docker push $TAG_NAME
 
 * don't use it on untrusted `Dockerfiles`
 * the exact checksum is not stable yet and can change between versions
+* variables expansion is not performed, so variables inside src paths in `ADD` and `COPY` will not work
 * `["src1", "src", "dst"]` syntax of `ADD` and `COPY` is not supported (PRs welcome)
 * file ownership is ignored
 * it was put together in 2 hours, so if you plan to use it in production, maybe... review the code or something and tell me what you think
