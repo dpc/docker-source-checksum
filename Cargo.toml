@@ -5,8 +5,8 @@ authors = ["Dawid Ciężarkiewicz <dpc@dpc.pw>"]
 edition = "2018"
 description = "Deterministic source-based docker image checksum"
 documentation = "https://docs.rs/docker-source-checksum"
-repository = "https://github.com/docker-source-checksum-dev/cargo-docker-source-checksum"
-homepage = "https://github.com/docker-source-checksum-dev/cargo-docker-source-checksum"
+repository = "https://github.com/dpc/docker-source-checksum"
+homepage = "https://github.com/dpc/docker-source-checksum"
 keywords = ["docker", "dockerfile", "tool", "checksum"]
 license = "MPL-2.0 OR MIT OR Apache-2.0"
 readme = "README.md"
@@ -23,4 +23,3 @@ blake2 = "0.8"
 base64 = "0.11"
 digest = "0.8"
 hex = "0.3"
-
