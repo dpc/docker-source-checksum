@@ -1,6 +1,6 @@
 [package]
 name = "docker-source-checksum"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Dawid Ciężarkiewicz <dpc@dpc.pw>"]
 edition = "2018"
 description = "Deterministic source-based docker image checksum"
