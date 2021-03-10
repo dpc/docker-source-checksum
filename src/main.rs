@@ -4,6 +4,7 @@ use common_failures::display::DisplayCausesAndBacktraceExt;
 use common_failures::Result;
 use crev_recursive_digest;
 use digest::Digest;
+use env_logger::Env;
 use failure::bail;
 use failure::{format_err, ResultExt};
 use glob;
@@ -121,7 +122,7 @@ fn metadata_to_u16(metadata: &std::fs::Metadata) -> u16 {
 }
 
 fn run() -> Result<()> {
-    env_logger::init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     let opts = opts::Opts::from_args();
 
     let dockerfile_path = opts
