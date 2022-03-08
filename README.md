@@ -11,12 +11,12 @@ even when the rest of the monorepo did.
 
 * `Dockerfile` content
 * all source files referenced by that `Dockerfile` (figured out by parsing it)
-* any additiona arguments that might affect the build
+* any additional arguments that might affect the build
 
 and then hashing all of these together, to give you deterministic checksum,
 before you even attempt to call `docker build`. You can use it as a
 deterministic content-based ID to avoid rebuilding containers that
-were already built (eg. by taging them with that checksum).
+were already built (eg. by tagging them with that checksum).
 
 ## Using in your CI pipeline
 
@@ -44,9 +44,9 @@ TAG_NAME=my-docker-repository.com/$PACKAGE_NAME:$BUILD_ID
 ```
 
 and in less than a second, even for a big project, you get a deterministic cryptographic ID
-of the build *without attemting to build anything just yet* .
+of the build *without attempting to build anything just yet* .
 At this point, you can potentially speculatively start parts of your CI
-with an already known docker image url.
+with an already known docker image URL.
 
 Rest of your CI script can quickly check if this exact build already exists with:
 
@@ -85,7 +85,7 @@ or use `cargo install docker-source-checksum`.
 
 ## Using
 
-Somewhat similiar to `docker build`:
+Somewhat similar to `docker build`:
 
 ```
 $ docker-source-checksum --help
