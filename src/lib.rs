@@ -28,7 +28,7 @@ fn get_coalesced_lines_from_dockerfile_content(content: String) -> Result<Vec<St
         }
     }
 
-    if prev_line != "" {
+    if !prev_line.is_empty() {
         bail!("Trailing \\");
     }
 
