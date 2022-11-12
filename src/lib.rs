@@ -50,9 +50,7 @@ fn get_external_paths_from_dockerfile_line(line: String) -> Result<Vec<PathBuf>>
     match cmd {
         "COPY" | "ADD" => {
             let src_globs: Vec<_> = parts.map(str::to_string).collect();
-            if src_globs.is_empty() {
-                bail!("No arguments to {} command?", cmd);
-            }
+            failure::ensure!(!src_globs.is_empty(), "No arguments to {cmd} commands?");
             let mut src_globs = &src_globs[..src_globs.len() - 1];
             trace!("Src globs: {:?}", src_globs);
 
