@@ -170,13 +170,7 @@ pub fn hash(dockerfile_path: &Path, opts: opts::Opts) -> Result<String> {
         .collect::<std::result::Result<Vec<_>, _>>()
         .map_err(|e| format_err!("{}", e))?;
 
-    digests.append(
-        &mut opts
-            .extra_string
-            .iter()
-            .map(|s| s.as_bytes().to_vec())
-            .collect(),
-    );
+    digests.extend(opts.extra_string.iter().map(|s| s.as_bytes().to_vec()));
 
     digests.push(dockerfile_content.as_bytes().to_vec());
 
