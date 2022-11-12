@@ -11,6 +11,14 @@ keywords = ["docker", "dockerfile", "tool", "checksum"]
 license = "MPL-2.0 OR MIT OR Apache-2.0"
 readme = "README.md"
 
+[[bin]]
+name = "docker-source-checksum"
+path = "src/main.rs"
+
+[lib]
+name = "docker_source_checksum"
+path = "src/lib.rs"
+
 [dependencies]
 failure = "0.1"
 common_failures = "0.1"
