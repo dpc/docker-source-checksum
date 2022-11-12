@@ -24,7 +24,7 @@ fn get_coalesced_lines_from_dockerfile_content(content: String) -> Result<Vec<St
             prev_line.push_str(&line[..line.len() - 1]);
         } else {
             prev_line.push_str(line);
-            res.push(std::mem::replace(&mut prev_line, "".into()))
+            res.push(std::mem::take(&mut prev_line))
         }
     }
 
